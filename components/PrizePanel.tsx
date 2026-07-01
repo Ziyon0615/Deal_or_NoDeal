@@ -26,7 +26,6 @@ export default function PrizePanel({
   winner,
   dealAccepted,
   totalRoundReveals,
-  showPrizeAmounts = false,
 }: PrizePanelProps) {
   return (
     <aside className="space-y-3 lg:sticky lg:top-4">
