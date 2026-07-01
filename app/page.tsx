@@ -295,8 +295,9 @@ export default function Home() {
 
   return (
     <main className="relative isolate min-h-screen bg-transparent p-4 text-stone-100 md:p-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,0.24)_0%,rgba(126,34,206,0.14)_24%,rgba(0,0,0,0)_52%),radial-gradient(circle_at_bottom_right,rgba(147,51,234,0.16)_0%,rgba(88,28,135,0.1)_20%,rgba(0,0,0,0)_42%)]" />
       {isFinalStage && !gameOver && (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.08)_0%,rgba(0,0,0,0.45)_42%,rgba(0,0,0,0.85)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.06)_0%,rgba(0,0,0,0.52)_40%,rgba(0,0,0,0.9)_100%)]" />
       )}
 
       <div className="relative z-10 mx-auto max-w-7xl">
