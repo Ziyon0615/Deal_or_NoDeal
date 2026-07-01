@@ -295,12 +295,13 @@ export default function Home() {
               round={round}
               totalRounds={ROUNDS.length}
               boxesRemainingThisRound={boxesRemainingThisRound}
-              revealPlayerBox={gameOver && !dealAccepted}
+              revealPlayerBox={gameOver}
             />
 
             {playerBox !== null && (
               <PlayerBoxDisplay
                 boxNumber={playerBox + 1}
+                briefcaseAmount={boxValues[playerBox]}
                 dealOffer={dealOffer}
                 gameOver={gameOver}
                 winner={winner}
