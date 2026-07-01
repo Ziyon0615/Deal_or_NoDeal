@@ -255,7 +255,7 @@ export default function Home() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3a2a05_0%,#090909_38%,#000000_100%)] p-4 text-stone-100 md:p-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 text-center animate-slide-in md:mb-10">
-          <p className="mb-2 text-xs font-black uppercase tracking-[0.45em] text-amber-300">Piso Edition</p>
+          <p className="mb-2 text-3xl font-black uppercase tracking-[0.45em] text-amber-300">INFORMATICS COLLEGE MANILA</p>
           <h1 className="mb-2 text-5xl font-black tracking-wide text-gold drop-shadow-[0_0_18px_rgba(255,215,0,0.45)] md:text-7xl">
             DEAL OR NO DEAL
           </h1>
@@ -322,6 +322,10 @@ export default function Home() {
             />
           </div>
         </div>
+
+        <footer className="mt-10 border-t border-white/10 pt-4 text-center text-xs font-semibold uppercase tracking-[0.35em] text-amber-200/80">
+          Developed by DSA
+        </footer>
       </div>
 
       {showDealModal && dealOffer !== null && (
