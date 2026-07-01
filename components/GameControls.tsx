@@ -5,6 +5,8 @@ interface GameControlsProps {
   playerBoxSelected: boolean
   gameOver: boolean
   onStart: () => void
+  finalStageReady?: boolean
+  onRevealFinal?: () => void
   revealedCount: number
   totalToOpen: number
   round: number
@@ -17,6 +19,8 @@ export default function GameControls({
   playerBoxSelected,
   gameOver,
   onStart,
+  finalStageReady,
+  onRevealFinal,
   revealedCount,
   totalToOpen,
   round,
@@ -29,10 +33,10 @@ export default function GameControls({
     <section className="space-y-4">
       <button
         type="button"
-        onClick={onStart}
+        onClick={finalStageReady && onRevealFinal ? onRevealFinal : onStart}
         className="w-full rounded-md border-2 border-gold bg-gradient-to-r from-gold to-amber-600 px-6 py-4 text-lg font-black uppercase tracking-wider text-black shadow-lg shadow-amber-500/30 transition duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-gold md:text-xl"
       >
-        {gameActive ? 'Start New Game' : 'Start Game'}
+        {finalStageReady ? 'Reveal Final 2 Briefcases' : gameActive ? 'Start New Game' : 'Start Game'}
       </button>
 
       {gameActive && playerBoxSelected && (
@@ -55,7 +59,9 @@ export default function GameControls({
 
       {gameActive && !playerBoxSelected && (
         <div className="rounded-lg border border-amber-500/50 bg-amber-950/30 p-4 text-center">
-          <p className="font-semibold text-amber-100">Select one briefcase to keep as yours.</p>
+          <p className="font-semibold text-amber-100">
+            Select one briefcase to keep as yours. The banker will still appear before the final reveal.
+          </p>
         </div>
       )}
     </section>

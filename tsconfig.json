@@ -21,6 +21,7 @@
     "noEmit": true,
     "jsx": "preserve",
     "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": [
         "./*"
@@ -39,11 +40,6 @@
     "app",
     "components",
     ".next/types/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
   ],
   "exclude": [
     "node_modules"

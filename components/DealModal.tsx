@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from 'react'
 
 interface DealModalProps {
@@ -28,7 +30,7 @@ export default function DealModal({ offer, isFinalOffer, onAccept, onReject }: D
       >
         <div className="border-b-2 border-gold bg-gradient-to-r from-black via-amber-950 to-black p-6 text-center">
           <p className="text-xs font-black uppercase tracking-[0.42em] text-amber-300">
-            {isFinalOffer ? 'Final Banker Call' : 'The Banker Calls'}
+            {isFinalOffer ? 'Last Banker Offer' : 'The Banker Calls'}
           </p>
           <h2 className="mt-2 text-2xl font-black uppercase tracking-wider text-gold md:text-3xl">
             Deal or No Deal
@@ -49,7 +51,7 @@ export default function DealModal({ offer, isFinalOffer, onAccept, onReject }: D
 
           <p className="mb-6 text-sm leading-relaxed text-stone-300">
             {isFinalOffer
-              ? 'This is the final offer. Choose Deal to take the money, or No Deal to reveal your selected briefcase.'
+              ? 'This is the last banker offer before the final stage. Choose Deal to take the money, or No Deal to reveal the final briefcases.'
               : 'Take the guaranteed amount now, or keep opening briefcases for the next banker offer.'}
           </p>
 

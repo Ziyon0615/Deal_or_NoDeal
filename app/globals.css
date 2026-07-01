@@ -64,6 +64,49 @@ body {
   }
 }
 
+@keyframes final-stage-zoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-4px);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes final-case-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes final-briefcase-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.55), 0 0 18px rgba(255, 215, 0, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.92), 0 0 34px rgba(255, 215, 0, 0.42);
+  }
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
@@ -74,6 +117,18 @@ body {
 
 .animate-offer-pop {
   animation: offer-pop 0.55s ease-out both;
+}
+
+.animate-final-stage-zoom {
+  animation: final-stage-zoom 0.6s ease-out both;
+}
+
+.animate-final-case-pop {
+  animation: final-case-pop 0.55s ease-out both;
+}
+
+.animate-final-briefcase-glow {
+  animation: final-briefcase-glow 1.8s ease-in-out infinite;
 }
 
 .briefcase-button {

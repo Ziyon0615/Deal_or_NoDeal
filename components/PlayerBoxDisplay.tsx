@@ -7,6 +7,8 @@ interface PlayerBoxDisplayProps {
   gameOver: boolean
   winner: number | null
   dealAccepted: boolean
+  isFinalRevealPending: boolean
+  finalDuelAmounts: { player: number; remaining: number } | null
 }
 
 function formatPiso(amount: number) {
@@ -20,6 +22,8 @@ export default function PlayerBoxDisplay({
   gameOver,
   winner,
   dealAccepted,
+  isFinalRevealPending,
+  finalDuelAmounts,
 }: PlayerBoxDisplayProps) {
   return (
     <section className="rounded-lg border-2 border-gold/70 bg-black/80 p-4 shadow-lg shadow-amber-900/30 md:p-5">
@@ -43,7 +47,25 @@ export default function PlayerBoxDisplay({
             {gameOver ? 'Result' : "Banker's Offer"}
           </p>
           <div className="flex min-h-24 items-center justify-center rounded-md border border-gold/50 bg-gold/10 px-3 py-4">
-            {gameOver && winner !== null ? (
+            {isFinalRevealPending ? (
+              <div>
+                <p className="text-sm font-bold uppercase tracking-wider text-amber-200">
+                  Final two briefcases
+                </p>
+                {finalDuelAmounts ? (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-sm font-semibold text-amber-100">
+                      Your briefcase: <span className="font-black text-gold">{formatPiso(finalDuelAmounts.player)}</span>
+                    </p>
+                    <p className="text-sm font-semibold text-amber-100">
+                      Last briefcase: <span className="font-black text-gold">{formatPiso(finalDuelAmounts.remaining)}</span>
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-3xl font-black text-gold md:text-4xl">Please wait</p>
+                )}
+              </div>
+            ) : gameOver && winner !== null ? (
               <div>
                 <p className="text-sm font-bold uppercase tracking-wider text-amber-200">
                   {dealAccepted ? 'You accepted the deal' : 'Your briefcase value'}

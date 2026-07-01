@@ -14,6 +14,8 @@ interface GameBoardProps {
   totalRounds: number
   boxesRemainingThisRound: number
   revealPlayerBox: boolean
+  isFinalStage: boolean
+  finalCaseBox: number | null
 }
 
 function formatCompactPiso(amount: number) {
@@ -35,35 +37,67 @@ export default function GameBoard({
   totalRounds,
   boxesRemainingThisRound,
   revealPlayerBox,
+  isFinalStage,
+  finalCaseBox,
 }: GameBoardProps) {
   const boxArray = Array.from({ length: boxes }, (_, index) => index)
   const isChoosingPlayerBox = gameStarted && playerBox === null && !gameOver
+  const finalStageBoxes =
+    isFinalStage && playerBox !== null && typeof finalCaseBox === 'number'
+      ? [playerBox, finalCaseBox]
+      : []
 
   return (
-    <section className="rounded-lg border-2 border-amber-500/70 bg-black/80 p-4 shadow-2xl shadow-amber-900/30 backdrop-blur md:p-6">
+    <section
+      className={`relative overflow-hidden rounded-lg border-2 border-amber-500/70 bg-black/80 p-4 shadow-2xl shadow-amber-900/30 backdrop-blur md:p-6 ${
+        isFinalStage ? 'border-gold/90 bg-zinc-950/95 shadow-[0_0_70px_rgba(255,215,0,0.2)]' : ''
+      }`}
+    >
+      {isFinalStage && !gameOver && (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.16)_0%,rgba(0,0,0,0.38)_48%,rgba(0,0,0,0.78)_100%)]" />
+      )}
+
+      <div className="relative z-10">
       <div className="mb-5 flex flex-col gap-2 text-center md:flex-row md:items-end md:justify-between md:text-left">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.35em] text-amber-300">
             Briefcases 1 to 26
           </p>
           <h2 className="text-2xl font-black uppercase tracking-wider text-gold md:text-3xl">
-            {playerBox === null ? 'Select Your Briefcase' : 'Open Briefcases'}
+            {playerBox === null
+              ? 'Select Your Briefcase'
+              : isFinalStage
+              ? 'Final Stage: Deal or No Deal'
+              : 'Open Briefcases'}
           </h2>
         </div>
-        {playerBox !== null && !gameOver && (
+        {playerBox !== null && !gameOver && !isFinalStage && (
           <div className="rounded-md border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-100">
             Round {round + 1}/{totalRounds}: open {boxesRemainingThisRound} more
           </div>
         )}
+        {isFinalStage && !gameOver && (
+          <div className="rounded-md border border-gold/70 bg-gold/15 px-4 py-2 text-sm font-black uppercase tracking-[0.25em] text-gold shadow-[0_0_25px_rgba(255,215,0,0.2)]">
+            Final 2 spotlight
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7">
-        {boxArray.map((index) => {
+      <div
+        className={
+          isFinalStage
+            ? 'animate-final-stage-zoom grid grid-cols-1 gap-6 place-items-center md:grid-cols-2 md:gap-10'
+            : 'grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7'
+        }
+      >
+        {(isFinalStage ? finalStageBoxes : boxArray).map((index) => {
           const isPlayerBox = playerBox === index
           const isRevealed = selectedBoxes.includes(index) || (isPlayerBox && revealPlayerBox)
           const canSelect = isChoosingPlayerBox
-          const canReveal = gameActive && !isPlayerBox && !isRevealed
+          const canReveal = gameActive && !isPlayerBox && !isRevealed && !isFinalStage
           const disabled = (!canSelect && !canReveal) || gameOver
+          const boxValue = boxValues[index]
+          const safeBoxValue = typeof boxValue === 'number' ? boxValue : 0
 
           return (
             <button
@@ -76,13 +110,14 @@ export default function GameBoard({
               disabled={disabled}
               title={
                 isRevealed
-                  ? `Briefcase ${index + 1}: Piso ${boxValues[index].toLocaleString()}`
+                  ? `Briefcase ${index + 1}: Piso ${safeBoxValue.toLocaleString()}`
                   : isPlayerBox
                   ? `Your briefcase ${index + 1}`
                   : `Briefcase ${index + 1}`
               }
               className={`
                 briefcase-button group relative h-20 overflow-visible rounded-md border transition duration-300 md:h-24
+                ${isFinalStage ? 'animate-final-case-pop animate-final-briefcase-glow h-36 w-full max-w-[18rem] md:h-44 md:max-w-[20rem] md:scale-[1.08]' : ''}
                 ${isPlayerBox ? 'briefcase-owned border-gold shadow-lg shadow-amber-500/50' : ''}
                 ${isRevealed ? 'briefcase-opened border-red-500/70' : ''}
                 ${canSelect || canReveal ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/40' : 'cursor-not-allowed'}
@@ -96,7 +131,7 @@ export default function GameBoard({
                   {isRevealed ? (
                     <>
                       <span className="text-[10px] uppercase tracking-wider text-red-100">Piso</span>
-                      <span className="text-sm md:text-base">{formatCompactPiso(boxValues[index])}</span>
+                      <span className="text-sm md:text-base">{formatCompactPiso(safeBoxValue)}</span>
                     </>
                   ) : isPlayerBox ? (
                     <>
@@ -113,10 +148,21 @@ export default function GameBoard({
         })}
       </div>
 
-      {playerBox !== null && !gameOver && (
+      {playerBox !== null && !gameOver && !isFinalStage && (
         <div className="mt-6 rounded-lg border border-amber-500/50 bg-amber-950/35 p-4">
           <p className="text-center text-sm font-semibold text-amber-100 md:text-base">
             Your briefcase is #{playerBox + 1}. Open the requested briefcases to trigger the banker offer.
+          </p>
+        </div>
+      )}
+
+      {isFinalStage && !gameOver && (
+        <div className="mt-6 rounded-lg border border-gold/70 bg-gold/10 p-4 shadow-[0_0_25px_rgba(255,215,0,0.12)]">
+          <p className="text-center text-sm font-black uppercase tracking-[0.22em] text-gold md:text-base">
+            Final stage active
+          </p>
+          <p className="mt-2 text-center text-sm font-semibold text-amber-100 md:text-base">
+            Only two briefcases remain. This is the final decision.
           </p>
         </div>
       )}
@@ -128,6 +174,7 @@ export default function GameBoard({
           </p>
         </div>
       )}
+      </div>
     </section>
   )
 }

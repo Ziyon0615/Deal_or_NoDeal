@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import GameBoard from '@/components/GameBoard'
 import PrizePanel from '@/components/PrizePanel'
 import GameControls from '@/components/GameControls'
@@ -53,6 +53,10 @@ export default function Home() {
   const [winner, setWinner] = useState<number | null>(null)
   const [bankerMessage, setBankerMessage] = useState('')
   const [round, setRound] = useState(0)
+  const [isFinalStageReady, setIsFinalStageReady] = useState(false)
+  const [isFinalRevealPending, setIsFinalRevealPending] = useState(false)
+  const [finalDuelAmounts, setFinalDuelAmounts] = useState<{ player: number; remaining: number } | null>(null)
+  const finalRevealTimerRef = useRef<number | null>(null)
 
   const revealedBeforeRound = ROUNDS.slice(0, round).reduce((total, count) => total + count, 0)
   const openedThisRound = Math.max(0, selectedBoxes.length - revealedBeforeRound)
@@ -151,13 +155,14 @@ export default function Home() {
 
     setDealOffer(offer)
     setIsFinalOffer(finalOffer)
-    setBankerMessage('The banker is calculating the offer...')
     playSound('offer')
+
+    setBankerMessage(finalOffer ? 'Last banker offer before the final stage...' : 'The banker is calculating the offer...')
 
     window.setTimeout(() => {
       setBankerMessage(
         finalOffer
-          ? `Final offer: ${formatPiso(offer)}. Deal or No Deal?`
+          ? `Last offer: ${formatPiso(offer)}. Deal or No Deal?`
           : `The banker offers ${formatPiso(offer)}. Deal or No Deal?`
       )
       setShowDealModal(true)
@@ -165,6 +170,11 @@ export default function Home() {
   }
 
   const startGame = () => {
+    if (finalRevealTimerRef.current !== null) {
+      window.clearTimeout(finalRevealTimerRef.current)
+      finalRevealTimerRef.current = null
+    }
+
     setGameActive(true)
     setSelectedBoxes([])
     setBoxValues(shufflePrizes())
@@ -176,6 +186,9 @@ export default function Home() {
     setGameOver(false)
     setWinner(null)
     setRound(0)
+    setIsFinalStageReady(false)
+    setIsFinalRevealPending(false)
+    setFinalDuelAmounts(null)
     setBankerMessage('Select your lucky briefcase from 1 to 26.')
   }
 
@@ -188,7 +201,7 @@ export default function Home() {
   }
 
   const revealBox = (boxIndex: number) => {
-    if (!gameActive || gameOver || showDealModal || playerBox === null) return
+    if (!gameActive || gameOver || showDealModal || isFinalRevealPending || isFinalStageReady || playerBox === null) return
     if (boxIndex === playerBox || selectedBoxes.includes(boxIndex) || boxesRemainingThisRound === 0) return
 
     playSound('reveal')
@@ -224,22 +237,48 @@ export default function Home() {
   }
 
   const revealFinal = () => {
-    if (playerBox === null) return
+    if (playerBox === null || !isFinalStageReady) return
+
+    const remainingIndex = boxValues.findIndex((_, index) => index !== playerBox && !selectedBoxes.includes(index))
+    if (remainingIndex < 0) return
 
     const finalAmount = boxValues[playerBox]
-    playSound('win')
+    const remainingAmount = boxValues[remainingIndex]
+    if (typeof finalAmount !== 'number' || typeof remainingAmount !== 'number') return
+
     setShowDealModal(false)
     setDealAccepted(false)
-    setBankerMessage(`Your briefcase contains ${formatPiso(finalAmount)}.`)
-    setGameOver(true)
-    setWinner(finalAmount)
+    setFinalDuelAmounts({ player: finalAmount, remaining: remainingAmount })
+    setWinner(Math.max(finalAmount, remainingAmount))
+    setIsFinalRevealPending(true)
+    setBankerMessage('Revealing the final two briefcases...')
+
+    setSelectedBoxes((currentSelected) =>
+      currentSelected.includes(remainingIndex) ? currentSelected : [...currentSelected, remainingIndex]
+    )
+
+    if (finalRevealTimerRef.current !== null) {
+      window.clearTimeout(finalRevealTimerRef.current)
+    }
+
+    finalRevealTimerRef.current = window.setTimeout(() => {
+      playSound('win')
+      setBankerMessage(
+        `Final comparison: your briefcase has ${formatPiso(finalAmount)} and the last briefcase has ${formatPiso(remainingAmount)}.`
+      )
+      setGameOver(true)
+      setIsFinalRevealPending(false)
+      setIsFinalStageReady(false)
+      finalRevealTimerRef.current = null
+    }, 1100)
   }
 
   const rejectDeal = () => {
     setShowDealModal(false)
 
     if (isFinalOffer) {
-      revealFinal()
+      setIsFinalStageReady(true)
+      setBankerMessage('Final stage: only two briefcases remain. Reveal the final case when ready.')
       return
     }
 
@@ -250,10 +289,17 @@ export default function Home() {
   }
 
   const remainingBoxes = boxValues.filter((_, index) => index !== playerBox && !selectedBoxes.includes(index))
+  const finalCaseBoxIndex = boxValues.findIndex((_, index) => index !== playerBox && !selectedBoxes.includes(index))
+  const isFinalStage = playerBox !== null && !gameOver && isFinalStageReady && remainingBoxes.length === 1
+  const finalCaseBox = isFinalStage && finalCaseBoxIndex >= 0 ? finalCaseBoxIndex : null
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#3a2a05_0%,#090909_38%,#000000_100%)] p-4 text-stone-100 md:p-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="relative isolate min-h-screen bg-[radial-gradient(circle_at_top,#3a2a05_0%,#090909_38%,#000000_100%)] p-4 text-stone-100 md:p-8">
+      {isFinalStage && !gameOver && (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.08)_0%,rgba(0,0,0,0.45)_42%,rgba(0,0,0,0.85)_100%)]" />
+      )}
+
+      <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-8 text-center animate-slide-in md:mb-10">
           <p className="mb-2 text-3xl font-black uppercase tracking-[0.45em] text-amber-300">INFORMATICS COLLEGE MANILA</p>
           <h1 className="mb-2 text-5xl font-black tracking-wide text-gold drop-shadow-[0_0_18px_rgba(255,215,0,0.45)] md:text-7xl">
@@ -290,12 +336,14 @@ export default function Home() {
               onSelectBox={selectPlayerBox}
               onRevealBox={revealBox}
               gameStarted={gameActive}
-              gameActive={gameActive && playerBox !== null && !showDealModal && !gameOver}
+              gameActive={gameActive && playerBox !== null && !showDealModal && !gameOver && !isFinalRevealPending && !isFinalStageReady}
               gameOver={gameOver}
               round={round}
               totalRounds={ROUNDS.length}
               boxesRemainingThisRound={boxesRemainingThisRound}
               revealPlayerBox={gameOver}
+              isFinalStage={isFinalStage}
+              finalCaseBox={finalCaseBox}
             />
 
             {playerBox !== null && (
@@ -306,6 +354,8 @@ export default function Home() {
                 gameOver={gameOver}
                 winner={winner}
                 dealAccepted={dealAccepted}
+                isFinalRevealPending={isFinalRevealPending}
+                finalDuelAmounts={finalDuelAmounts}
               />
             )}
 
@@ -314,6 +364,8 @@ export default function Home() {
               playerBoxSelected={playerBox !== null}
               gameOver={gameOver}
               onStart={startGame}
+              finalStageReady={isFinalStageReady}
+              onRevealFinal={revealFinal}
               revealedCount={selectedBoxes.length}
               totalToOpen={TOTAL_ROUND_REVEALS}
               round={round}
