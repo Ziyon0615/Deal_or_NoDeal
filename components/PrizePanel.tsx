@@ -26,9 +26,8 @@ export default function PrizePanel({
   winner,
   dealAccepted,
   totalRoundReveals,
+  showPrizeAmounts = false,
 }: PrizePanelProps) {
-  const sortedPrizes = [...prizes].sort((a, b) => b - a)
-
   return (
     <aside className="space-y-3 lg:sticky lg:top-4">
       {gameOver && winner !== null && (
@@ -62,37 +61,6 @@ export default function PrizePanel({
         </div>
       )}
 
-      <div className="rounded-lg border-2 border-amber-500/70 bg-black/80 p-4 backdrop-blur">
-        <h3 className="sticky top-0 mb-3 bg-black py-1 text-xs font-black uppercase tracking-[0.32em] text-amber-300">
-          Prize Amounts
-        </h3>
-        <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto pr-1">
-          {sortedPrizes.map((prize) => {
-            const prizeIndex = prizes.indexOf(prize)
-            const isRevealed = revealedBoxes.includes(prizeIndex)
-            const isFinalPlayerPrize = gameOver && !dealAccepted && playerBox === prizeIndex
-
-            return (
-              <div
-                key={prize}
-                className={`
-                  flex min-h-9 items-center justify-between rounded-md px-2 py-2 text-[11px] font-black transition-all duration-300 md:text-xs
-                  ${isFinalPlayerPrize
-                    ? 'border-2 border-gold bg-gold/20 text-gold shadow-md shadow-amber-500/20'
-                    : isRevealed
-                    ? 'border border-red-500/45 bg-red-950/45 text-red-300/60 line-through opacity-60'
-                    : 'border border-amber-500/35 bg-zinc-950 text-stone-100'
-                  }
-                `}
-              >
-                <span>{formatPiso(prize)}</span>
-                <span>{isFinalPlayerPrize ? 'Final' : isRevealed ? 'Out' : ''}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
       {playerBox !== null && (
         <div className="rounded-lg border border-amber-500/50 bg-black/80 p-4 text-stone-200">
           <div className="space-y-2 text-xs">
@@ -102,12 +70,11 @@ export default function PrizePanel({
                 {revealedBoxes.length}/{totalRoundReveals}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-zinc-900 ring-1 ring-amber-500/40">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-500 via-gold to-amber-300 transition-all"
-                style={{ width: `${Math.min(100, (revealedBoxes.length / totalRoundReveals) * 100)}%` }}
-              />
-            </div>
+            <progress
+              className="reveal-progress h-2 w-full rounded-full ring-1 ring-amber-500/40"
+              max={totalRoundReveals}
+              value={revealedBoxes.length}
+            />
             <div className="flex justify-between gap-3">
               <span className="font-semibold">Hidden:</span>
               <span className="font-black text-amber-100">{remainingBoxes.length}</span>

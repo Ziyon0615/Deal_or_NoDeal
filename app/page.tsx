@@ -294,7 +294,7 @@ export default function Home() {
   const finalCaseBox = isFinalStage && finalCaseBoxIndex >= 0 ? finalCaseBoxIndex : null
 
   return (
-    <main className="relative isolate min-h-screen bg-[radial-gradient(circle_at_top,#3a2a05_0%,#090909_38%,#000000_100%)] p-4 text-stone-100 md:p-8">
+    <main className="relative isolate min-h-screen bg-transparent p-4 text-stone-100 md:p-8">
       {isFinalStage && !gameOver && (
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.08)_0%,rgba(0,0,0,0.45)_42%,rgba(0,0,0,0.85)_100%)]" />
       )}

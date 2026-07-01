@@ -13,8 +13,14 @@ html {
 }
 
 body {
-  background: #000;
+  background:
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.28), transparent 32%),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.25), transparent 30%),
+    radial-gradient(circle at bottom, rgba(14, 165, 233, 0.14), transparent 34%),
+    linear-gradient(135deg, #050816 0%, #0b1020 48%, #060814 100%);
   min-height: 100vh;
+  color: #f8fafc;
+  background-attachment: fixed;
 }
 
 @keyframes pulse-glow {
@@ -219,4 +225,26 @@ body {
   color: #fff7ed;
   transform: translateY(-4px);
   animation: offer-pop 0.45s ease-out both;
+}
+
+.reveal-progress {
+  -webkit-appearance: none;
+  appearance: none;
+  overflow: hidden;
+  background: #18181b;
+}
+
+.reveal-progress::-webkit-progress-bar {
+  background: #18181b;
+  border-radius: 9999px;
+}
+
+.reveal-progress::-webkit-progress-value {
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #f59e0b 0%, #ffd54d 55%, #fde68a 100%);
+}
+
+.reveal-progress::-moz-progress-bar {
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #f59e0b 0%, #ffd54d 55%, #fde68a 100%);
 }
