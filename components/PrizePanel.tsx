@@ -28,10 +28,6 @@ export default function PrizePanel({
   totalRoundReveals,
 }: PrizePanelProps) {
   const sortedPrizes = [...prizes].sort((a, b) => b - a)
-  const averageRemaining =
-    remainingBoxes.length > 0
-      ? Math.floor(remainingBoxes.reduce((total, value) => total + value, 0) / remainingBoxes.length)
-      : 0
 
   return (
     <aside className="space-y-3 lg:sticky lg:top-4">
@@ -57,10 +53,12 @@ export default function PrizePanel({
       {remainingBoxes.length > 0 && !gameOver && (
         <div className="rounded-lg border border-amber-500/50 bg-black/80 p-4">
           <p className="mb-2 text-xs font-black uppercase tracking-[0.32em] text-amber-300">
-            Average Remaining
+            Briefcases Still Hidden
           </p>
-          <p className="text-2xl font-black text-amber-100">{formatPiso(averageRemaining)}</p>
-          <p className="mt-1 text-xs font-semibold text-stone-400">{remainingBoxes.length} briefcases still hidden</p>
+          <p className="text-2xl font-black text-amber-100">{remainingBoxes.length}</p>
+          <p className="mt-1 text-xs font-semibold text-stone-400">
+            {remainingBoxes.length} briefcases still hidden
+          </p>
         </div>
       )}
 
